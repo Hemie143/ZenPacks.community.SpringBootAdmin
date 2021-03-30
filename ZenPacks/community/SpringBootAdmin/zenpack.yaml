@@ -1,1 +1,261 @@
 name: ZenPacks.community.SpringBootAdmin
+
+zProperties:
+  zSpringBootAdminPort:
+    category: SpringBootAdmin
+    type: int
+    default: 8134
+  zSpringBootAdminURI:
+    category: SpringBootAdmin
+    type: string
+    default: 'spring-boot-admin_v2/applications'
+  zSpringBootAdminIVGroups:
+    category: SpringBootAdmin
+    type: string
+  zSpringBootAdminIVUser:
+    category: SpringBootAdmin
+    type: string
+
+classes:
+  SpringBootAdmin:
+    base: [zenpacklib.Component]
+    label: Spring Boot Admin
+    monitoring_templates: [SpringBootAdmin]
+    properties:
+      DEFAULTS:
+        grid_display: false
+      version:
+        label: Version
+        grid_display: true
+        label_width: 80
+      status_text:
+        label: Status
+        grid_display: true
+        enum:
+          0: 'UP'
+          1: 'RESTRICTED'
+          2: 'Exception'
+          3: 'OFFLINE'
+          4: 'DOWN'
+        datapoint: health_status
+        datapoint_cached: true
+        datapoint_default: 0
+        label_width: 40
+    relationships:
+      springBootAdminApplications:
+        label: Applications
+
+  SpringBootAdminApplication:
+    base: [zenpacklib.Component]
+    label: Spring Boot Application
+    order: 1
+    monitoring_templates: [SpringBootAdminApplication]
+    properties:
+      status_text:
+        label: Status
+        grid_display: true
+        enum:
+          0: 'UP'
+          1: 'RESTRICTED'
+          2: 'Exception'
+          3: 'OFFLINE'
+          4: 'DOWN'
+        datapoint: health_status
+        datapoint_cached: true
+        datapoint_default: 0
+        label_width: 40
+    relationships:
+      springBootAdmin:
+        grid_display: false
+      springBootAdminInstances:
+        label: Instances
+
+  SpringBootAdminInstance:
+    base: [zenpacklib.Component]
+    label: Spring Boot Application Instance
+    monitoring_templates: [SpringBootAdminInstance]
+    properties:
+      DEFAULTS:
+        grid_display: false
+      status_text:
+        label: Status
+        grid_display: true
+        enum:
+          0: 'UP'
+          1: 'RESTRICTED'
+          2: 'Exception'
+          3: 'OFFLINE'
+          4: 'DOWN'
+        datapoint: health_status
+        datapoint_cached: true
+        datapoint_default: 0
+        label_width: 40
+    relationships:
+      springBootAdminApplication:
+        label: Applications
+        grid_display: false
+      springBootAdminComponents:
+        label: Components
+
+  SpringBootAdminComponent:
+    base: [zenpacklib.Component]
+    label: Spring Boot Application Component
+    monitoring_templates: [SpringBootAdminComponent]
+    properties:
+      DEFAULTS:
+        grid_display: false
+      status_text:
+        label: Status
+        grid_display: true
+        enum:
+          0: 'UP'
+          1: 'RESTRICTED'
+          2: 'Exception'
+          3: 'OFFLINE'
+          4: 'DOWN'
+        datapoint: health_status
+        datapoint_cached: true
+        datapoint_default: 0
+        label_width: 40
+    relationships:
+      springBootAdminInstance:
+        label: Instances
+
+class_relationships:
+  - Products.ZenModel.Device.Device 1:MC SpringBootAdmin
+  - SpringBootAdmin 1:MC SpringBootAdminApplication
+  - SpringBootAdminApplication 1:MC SpringBootAdminInstance
+  - SpringBootAdminInstance 1:MC SpringBootAdminComponent
+
+device_classes:
+  /Server/SSH/Linux/Applications:
+    zProperties:
+      zCollectorPlugins:
+        - zenoss.cmd.uname
+        - zenoss.cmd.linux.df
+        - zenoss.cmd.linux.cpuinfo
+        - zenoss.cmd.linux.interfaces
+        - zenoss.cmd.linux.lvm
+        - zenoss.cmd.linux.memory
+        - zenoss.cmd.linux.netstat_an
+        - zenoss.cmd.linux.netstat_rn
+        - zenoss.cmd.linux.process
+        - zenoss.cmd.linux.sudo_dmidecode
+        - zenoss.cmd.linux.os_release
+        - zenoss.cmd.linux.os_service
+        - community.json.SpringBootAdmin
+      zDeviceTemplates:
+        - Device
+
+    templates:
+      SpringBootAdmin:
+        targetPythonClass: ZenPacks.community.SpringBootAdmin.SpringBootAdmin
+        datasources:
+          health:
+            type: Python
+            plugin_classname: ZenPacks.community.SpringBootAdmin.dsplugins.health.Health
+            datapoints:
+              status:
+                rrdtype: GAUGE
+
+      SpringBootAdminApplication:
+        targetPythonClass: ZenPacks.community.SpringBootAdmin.SpringBootAdminApplication
+        datasources:
+          health:
+            type: Python
+            plugin_classname: ZenPacks.community.SpringBootAdmin.dsplugins.health.Health
+            datapoints:
+              status:
+                rrdtype: GAUGE
+        thresholds:
+          Health_Warn:
+            dsnames: [health_status]
+            eventClass: /Status/SBA/Application
+            severity: warning
+            minval: 2
+            maxval: 0
+          Health_Error:
+            dsnames: [health_status]
+            eventClass: /Status/SBA/Application
+            severity: error
+            minval: 4
+            maxval: 2
+          Health_Critical:
+            dsnames: [health_status]
+            eventClass: /Status/SBA/Application
+            severity: critical
+            maxval: 3
+
+      SpringBootAdminInstance:
+        targetPythonClass: ZenPacks.community.SpringBootAdmin.SpringBootAdminInstance
+        datasources:
+          health:
+            type: Python
+            plugin_classname: ZenPacks.community.SpringBootAdmin.dsplugins.health.Health
+            datapoints:
+              status:
+                rrdtype: GAUGE
+        thresholds:
+          Health_Warn:
+            dsnames: [health_status]
+            eventClass: /Status/SBA/Instance
+            severity: warning
+            minval: 2
+            maxval: 0
+          Health_Error:
+            dsnames: [health_status]
+            eventClass: /Status/SBA/Instance
+            severity: error
+            minval: 4
+            maxval: 2
+          Health_Critical:
+            dsnames: [health_status]
+            eventClass: /Status/SBA/Instance
+            severity: critical
+            maxval: 3
+
+      SpringBootAdminComponent:
+        targetPythonClass: ZenPacks.community.SpringBootAdmin.SpringBootAdminComponent
+        datasources:
+          health:
+            type: Python
+            plugin_classname: ZenPacks.community.SpringBootAdmin.dsplugins.health.Health
+            datapoints:
+              status:
+                rrdtype: GAUGE
+
+event_classes:
+  /Status/SBA:
+    remove: false
+  /Status/SBA/Admin:
+    remove: false
+  /Status/SBA/Application:
+    remove: false
+    transform: |-
+      if 'health_status' in evt.eventKey:
+        status_maps = {
+          0: 'UP',
+          1: 'RESTRICTED',
+          2: 'Exception',
+          3: 'OFFLINE',
+          4: 'DOWN',
+        }
+        status = status_maps.get(int(evt.current), 'Unknown')
+        message = 'Application {} - Status is {}'.format(component.title, status)
+        evt.message = message
+        evt.summary = message
+  /Status/SBA/Instance:
+    remove: false
+    transform: |-
+      if 'health_status' in evt.eventKey:
+        status_maps = {
+          0: 'UP',
+          1: 'RESTRICTED',
+          2: 'Exception',
+          3: 'OFFLINE',
+          4: 'DOWN',
+        }
+        status = status_maps.get(int(evt.current), 'Unknown')
+        message = 'Instance {} - Status is {}'.format(component.title, status)
+        evt.message = message
+        evt.summary = message

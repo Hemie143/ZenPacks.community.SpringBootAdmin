@@ -232,6 +232,9 @@ event_classes:
   /Status/SBA/Application:
     remove: false
     transform: |-
+      if hasattr(component, 'productionState') and (component.productionState <= 300):
+          evt.severity = 2
+
       if 'health_status' in evt.eventKey:
         status_maps = {
           0: 'UP',
@@ -240,13 +243,21 @@ event_classes:
           3: 'OFFLINE',
           4: 'DOWN',
         }
+        if component:
+          comp = component.title
+        else:
+          comp = evt.component
         status = status_maps.get(int(evt.current), 'Unknown')
-        message = 'Application {} - Status is {}'.format(component.title, status)
+        message = 'Application {} - Status is {}'.format(comp, status)
         evt.message = message
         evt.summary = message
+
   /Status/SBA/Instance:
     remove: false
     transform: |-
+      if hasattr(component, 'productionState') and (component.productionState <= 300):
+          evt.severity = 2
+
       if 'health_status' in evt.eventKey:
         status_maps = {
           0: 'UP',
@@ -255,7 +266,11 @@ event_classes:
           3: 'OFFLINE',
           4: 'DOWN',
         }
+        if component:
+          comp = component.title
+        else:
+          comp = evt.component
         status = status_maps.get(int(evt.current), 'Unknown')
-        message = 'Instance {} - Status is {}'.format(component.title, status)
+        message = 'Instance {} - Status is {}'.format(comp, status)
         evt.message = message
         evt.summary = message

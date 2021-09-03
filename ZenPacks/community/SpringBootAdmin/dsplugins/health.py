@@ -29,6 +29,8 @@ class Health(PythonDataSourcePlugin):
         'Exception': 2,
         'OFFLINE': 3,
         'DOWN': 4,
+        'OUT_OF_SERVICE': 5,
+        'UNKNOWN': 6,
     }
 
     status_severity_maps = {
@@ -37,6 +39,8 @@ class Health(PythonDataSourcePlugin):
         'Exception': 3,
         'OFFLINE': 4,
         'DOWN': 5,
+        'OUT_OF_SERVICE': 5,
+        'UNKNOWN': 3,
     }
 
     @classmethod
@@ -115,6 +119,21 @@ class Health(PythonDataSourcePlugin):
                         log.error('Component Data: {}'.format(c_data))
                     value = self.status_maps.get(component_status, 3)
                     data['values'][component_id]['health_status'] = value
+
+                if instance_status != 'UP':
+                    log.debug('AAA : {}'.format(details))
+                    if 'exception' in details:
+                        info = 'Exception: {}<br>Message: {}<br>'.format(details['exception'], details['message'])
+                    else:
+                        info = 'Failed components:'
+                        # test = [k for k, v in details.items() if v['status'] != 'UP']
+                        for c, c_data in details.items():
+                            if c_data['status'] != 'UP':
+                                info += '\r\n    {}'.format(c)
+                                if 'details' in c_data:
+                                    for k, v in c_data['details'].items():
+                                        info += '\r\n        {}: {}'.format(k, v)
+                    log.debug('AAA: {}'.format(info))
 
         return data
 

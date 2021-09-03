@@ -60,10 +60,12 @@ classes:
           2: 'Exception'
           3: 'OFFLINE'
           4: 'DOWN'
+          5: 'OUT_OF_SERVICE'
+          6: 'UNKNOWN'
         datapoint: health_status
         datapoint_cached: true
         datapoint_default: 0
-        label_width: 40
+        label_width: 60
     relationships:
       springBootAdmin:
         grid_display: false
@@ -86,10 +88,12 @@ classes:
           2: 'Exception'
           3: 'OFFLINE'
           4: 'DOWN'
+          5: 'OUT_OF_SERVICE'
+          6: 'UNKNOWN'
         datapoint: health_status
         datapoint_cached: true
         datapoint_default: 0
-        label_width: 40
+        label_width: 60
     relationships:
       springBootAdminApplication:
         label: Applications
@@ -113,10 +117,12 @@ classes:
           2: 'Exception'
           3: 'OFFLINE'
           4: 'DOWN'
+          5: 'OUT_OF_SERVICE'
+          6: 'UNKNOWN'
         datapoint: health_status
         datapoint_cached: true
         datapoint_default: 0
-        label_width: 40
+        label_width: 60
     relationships:
       springBootAdminInstance:
         label: Instances

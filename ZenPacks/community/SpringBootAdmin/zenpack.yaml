@@ -271,12 +271,22 @@ event_classes:
           2: 'Exception',
           3: 'OFFLINE',
           4: 'DOWN',
+          5: 'OUT_OF_SERVICE',
+          6: 'UNKNOWN',
         }
         if component:
           comp = component.title
         else:
           comp = evt.component
-        status = status_maps.get(int(evt.current), 'Unknown')
-        message = 'Instance {} - Status is {}'.format(comp, status)
+        current_value = getattr(evt, 'current', '')
+        if current_value:
+          status = status_maps.get(int(evt.current), 'Unknown')
+        else:
+          status = getattr(evt, 'SBA_instance_status', 'Unknown')
+        summary = 'Instance {} - Status is {}'.format(comp, status)
+        if 'extra_info' in evt.details._map:
+          message = getattr(evt, 'extra_info', '')
+        else:
+          message = summary
         evt.message = message
-        evt.summary = message
+        evt.summary = summary

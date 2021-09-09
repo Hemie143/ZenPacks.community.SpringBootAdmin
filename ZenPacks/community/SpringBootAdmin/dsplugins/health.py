@@ -121,19 +121,43 @@ class Health(PythonDataSourcePlugin):
                     data['values'][component_id]['health_status'] = value
 
                 if instance_status != 'UP':
-                    log.debug('AAA : {}'.format(details))
                     if 'exception' in details:
-                        info = 'Exception: {}<br>Message: {}<br>'.format(details['exception'], details['message'])
+                        info = '&nbsp;&nbsp;Exception: {}<br>Message: {}<br>'.format(details['exception'], details['message'])
+                    elif len(details) == 2 and 'status' in details and 'error' in details:
+                        info = '&nbsp;&nbsp;Status: {}<br>&nbsp;&nbsp;Error: {}<br>'.format(details['status'], details['error'])
                     else:
-                        info = 'Failed components:'
-                        # test = [k for k, v in details.items() if v['status'] != 'UP']
+                        info = '&nbsp;&nbsp;Failed components:<br>'
                         for c, c_data in details.items():
                             if c_data['status'] != 'UP':
-                                info += '\r\n    {}'.format(c)
+                                info += '&nbsp;&nbsp;&nbsp;&nbsp;{}<br>'.format(c)
                                 if 'details' in c_data:
                                     for k, v in c_data['details'].items():
-                                        info += '\r\n        {}: {}'.format(k, v)
-                    log.debug('AAA: {}'.format(info))
+                                        info += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{}: {}<br>'.format(k, v)
+                    data['events'].append({
+                        'device': config.id,
+                        'component': instance_id,
+                        'severity': 3,
+                        'eventKey': 'SBAInstance-health_status',
+                        'eventClassKey': 'SBAInstance',
+                        'eventClass': '/Status/SBA/Instance',
+                        'summary': 'Instance is down',
+                        'message': 'Instance {} - Status is {}'.format(instance_id, instance_status),
+                        'extra_info': info,
+                        'SBA_instance_status': instance_status,
+                    })
+                else:
+                    data['events'].append({
+                        'device': config.id,
+                        'component': instance_id,
+                        'severity': 0,
+                        'eventKey': 'SBAInstance-health_status',
+                        'eventClassKey': 'SBAInstance',
+                        'eventClass': '/Status/SBA/Instance',
+                        'summary': 'Instance is up',
+                        'message': 'Instance is up',
+                        'extra_info': '',
+                    })
+
 
         return data
 

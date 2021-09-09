@@ -201,24 +201,24 @@ device_classes:
             datapoints:
               status:
                 rrdtype: GAUGE
-        thresholds:
-          Health_Warn:
-            dsnames: [health_status]
-            eventClass: /Status/SBA/Instance
-            severity: warning
-            minval: 2
-            maxval: 0
-          Health_Error:
-            dsnames: [health_status]
-            eventClass: /Status/SBA/Instance
-            severity: error
-            minval: 4
-            maxval: 2
-          Health_Critical:
-            dsnames: [health_status]
-            eventClass: /Status/SBA/Instance
-            severity: critical
-            maxval: 3
+        thresholds: {}
+#          Health_Warn:
+#            dsnames: [health_status]
+#            eventClass: /Status/SBA/Instance
+#            severity: warning
+#            minval: 2
+#            maxval: 0
+#          Health_Error:
+#            dsnames: [health_status]
+#            eventClass: /Status/SBA/Instance
+#            severity: error
+#            minval: 4
+#            maxval: 2
+#          Health_Critical:
+#            dsnames: [health_status]
+#            eventClass: /Status/SBA/Instance
+#            severity: critical
+#            maxval: 3
 
       SpringBootAdminComponent:
         targetPythonClass: ZenPacks.community.SpringBootAdmin.SpringBootAdminComponent

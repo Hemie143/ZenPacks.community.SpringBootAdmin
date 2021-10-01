@@ -66,6 +66,9 @@ classes:
         datapoint_cached: true
         datapoint_default: 0
         label_width: 60
+      sba_application:
+        label: SBA Application
+        grid_display: false
     relationships:
       springBootAdmin:
         grid_display: false
@@ -94,6 +97,9 @@ classes:
         datapoint_cached: true
         datapoint_default: 0
         label_width: 60
+      sba_application:
+        label: SBA Application
+        grid_display: false
     relationships:
       springBootAdminApplication:
         label: Applications
@@ -123,6 +129,9 @@ classes:
         datapoint_cached: true
         datapoint_default: 0
         label_width: 60
+      sba_application:
+        label: SBA Application
+        grid_display: false
     relationships:
       springBootAdminInstance:
         label: Instances
@@ -248,9 +257,13 @@ event_classes:
           2: 'Exception',
           3: 'OFFLINE',
           4: 'DOWN',
+          5: 'OUT_OF_SERVICE',
+          6: 'UNKNOWN',
         }
         if component:
           comp = component.title
+          sba_application = component.sba_application
+          evt.SBA_Application = sba_application
         else:
           comp = evt.component
         status = status_maps.get(int(evt.current), 'Unknown')
@@ -290,3 +303,39 @@ event_classes:
           message = summary
         evt.message = message
         evt.summary = summary
+  /Status/SBA/Component:
+    remove: false
+    transform: |-
+      if hasattr(component, 'productionState') and (component.productionState <= 300):
+          evt.severity = 2
+
+      if 'health_status' in evt.eventKey:
+        status_maps = {
+          0: 'UP',
+          1: 'RESTRICTED',
+          2: 'Exception',
+          3: 'OFFLINE',
+          4: 'DOWN',
+          5: 'OUT_OF_SERVICE',
+          6: 'UNKNOWN',
+        }
+        if component:
+          comp = component.title
+          sba_application = component.sba_application
+          evt.SBA_Application = sba_application
+        else:
+          comp = evt.component
+        current_value = getattr(evt, 'current', '')
+        if current_value:
+          status = status_maps.get(int(evt.current), 'Unknown')
+        else:
+          status = getattr(evt, 'SBA_instance_status', 'Unknown')
+        summary = 'Component {} - Status is {}'.format(comp, status)
+
+        if 'extra_info' in evt.details._map:
+          message = getattr(evt, 'extra_info', '')
+        else:
+          message = summary
+        evt.message = message
+        evt.summary = summary
+

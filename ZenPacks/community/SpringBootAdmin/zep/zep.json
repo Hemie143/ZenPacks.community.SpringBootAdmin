@@ -1,0 +1,13 @@
+//
+// This file is used to add custom event fields. It will be loaded when the
+// ZenPack is installed.
+//
+{
+    "EventDetailItem" : [
+        {
+            "name" : "SBA Application",
+            "key" : "SBA_Application",
+            "type" : 1
+        }
+    ]
+}

@@ -112,6 +112,7 @@ class SpringBootAdmin(PythonPlugin):
                 om_app.title = '{} ({})'.format(app_name, app_build)
             else:
                 om_app.title = '{}'.format(app_name)
+            om_app.sba_application = app_name.upper()
             app_maps.append(om_app)
 
             # Instances
@@ -139,6 +140,7 @@ class SpringBootAdmin(PythonPlugin):
                 om_instance.buildVersion = instance['buildVersion']
                 om_instance.hostingServer = hostingServer
                 om_instance.hostingPort = hostingPort
+                om_instance.sba_application = app_name.upper()
                 instance_maps.append(om_instance)
 
                 # Components
@@ -150,6 +152,7 @@ class SpringBootAdmin(PythonPlugin):
                     component_id = '{}_{}_{}'.format(app_name, instance_id, component)
                     om_component.id = self.prepId(component_id)
                     om_component.title = '{} of {} on {}'.format(component, app_name, hostingServer)
+                    om_component.sba_application = app_name.upper()
                     component_maps.append(om_component)
 
                 component_rm.append(RelationshipMap(compname=comp_instance,

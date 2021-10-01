@@ -143,7 +143,7 @@ class Health(PythonDataSourcePlugin):
                         'summary': 'Instance is down',
                         'message': 'Instance {} - Status is {}'.format(instance_id, instance_status),
                         'extra_info': info,
-                        'SBA_instance_status': instance_status,
+                        'SBA_Application': app_name.upper(),
                     })
                 else:
                     data['events'].append({
@@ -156,8 +156,8 @@ class Health(PythonDataSourcePlugin):
                         'summary': 'Instance is up',
                         'message': 'Instance is up',
                         'extra_info': '',
+                        'SBA_Application': app_name.upper(),
                     })
-
 
         return data
 

@@ -133,6 +133,7 @@ class Health(PythonDataSourcePlugin):
                                 if 'details' in c_data:
                                     for k, v in c_data['details'].items():
                                         info += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{}: {}<br>'.format(k, v)
+                    # TODO: include SBA_instance_status in event (see Event Transform)
                     data['events'].append({
                         'device': config.id,
                         'component': instance_id,
